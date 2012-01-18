@@ -1,0 +1,2 @@
+tablib==0.9.11
+wsgiref==0.1.2
