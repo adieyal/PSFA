@@ -5,7 +5,7 @@ import os
 import tablib
 import xlrd
 from mx.DateTime import Time, strptime
-from collections import OrderedDict
+from ordereddict import OrderedDict
 
 school_map = {}
 menus = {}
@@ -13,8 +13,6 @@ menus = {}
 q_map = {
     "D1" : "D1. Check the menu for the day. Was this the meal that was served in the school today?",
 }
-
-
 
 class ScorecardDataset(object):
     def __init__(self, *args, **kwargs):
@@ -36,6 +34,9 @@ class ScorecardDataset(object):
 
     def no_is_1(self, val):
         return 1 if val.lower().strip() == "no" else 0
+
+    def is_cooking_school(self, row):
+        return "cooking" if self._get_col_value("B7", row) == "Cooking" else "non-cooking"
         
     def meal_delivery_points(self, row):
         pt_D1 = self.yes_is_1(self._get_col_value("D1", row))
@@ -48,7 +49,7 @@ class ScorecardDataset(object):
         pt_D7a = 2 if self._get_col_value("D7a", row) < time_1030 else 0
         diff = self._get_col_value("D7b", row) - self._get_col_value("D7a", row)
         pt_D7b = 1 if diff.minutes < 30 else 0
-        val_cooking = "cooking" if self._get_col_value("B7", row) == "Cooking" else "non-cooking"
+        val_cooking = self.is_cooking_school(row)
         val_school_num = int(self._get_col_value("A3", row))
         val_school_type = school_map[val_school_num]
         val_total_fed = int(self._get_col_value("B3", row))
@@ -113,46 +114,62 @@ class ScorecardDataset(object):
         return pt_D1 + pt_D3 + pt_D4 + pt_D5 + pt_D6 + pt_D7a + pt_D7b + pt_ranges
 
     def hygiene_points(self, row):
-        E2 = self.yes_is_1(self._get_col_value("E2", row))
-        E3 = self.yes_is_1(self._get_col_value("E3", row))
-        E4 = self.yes_is_1(self._get_col_value("E4", row))
-        E5 = self.yes_is_1(self._get_col_value("E5", row))
-        E6 = self.yes_is_1(self._get_col_value("E6", row))
-        E10 = self.yes_is_1(self._get_col_value("E10", row)) * 0.5
-        E11 = self.yes_is_1(self._get_col_value("E11", row)) * 0.5
+        pt_E2 = self.yes_is_1(self._get_col_value("E2", row))
+        pt_E3 = self.yes_is_1(self._get_col_value("E3", row))
+        pt_E4 = self.yes_is_1(self._get_col_value("E4", row))
+        pt_E5 = self.yes_is_1(self._get_col_value("E5", row))
+        pt_E6 = self.yes_is_1(self._get_col_value("E6", row))
+        pt_E10 = self.yes_is_1(self._get_col_value("E10", row)) * 0.5
+        pt_E11 = self.yes_is_1(self._get_col_value("E11", row)) * 0.5
 
         # 1 point if E5=NO, but E6=YES
-        if E5 == 0 and E6 == 1:
-            E5 = 1
+        if pt_E5 == 0 and pt_E6 == 1:
+            pt_E5 = 1
 
-        return E2 + E3 + E4 + E5 + E10 + E11
+        return pt_E2 + pt_E3 + pt_E4 + pt_E5 + pt_E10 + pt_E11
 
     def stock_points(self, row):
-        C1 = self.yes_is_1(self._get_col_value("C1", row))
-        C2 = self.yes_is_1(self._get_col_value("C2", row))
-        C3 = self.yes_is_1(self._get_col_value("C3", row))
-        C4 = self.yes_is_1(self._get_col_value("C4", row))
-        C5 = self.yes_is_1(self._get_col_value("C5", row)) * 0.5
-        C6 = self.yes_is_1(self._get_col_value("C6", row)) * 0.5
-        C7 = self.yes_is_1(self._get_col_value("C7", row)) * 0.5
-        C8 = self.yes_is_1(self._get_col_value("C8", row)) * 0.5
-        C9 = self.yes_is_1(self._get_col_value("C9", row))
-        C10 = self.yes_is_1(self._get_col_value("C10", row)) * 0.5
-        C11 = self.yes_is_1(self._get_col_value("C11", row)) * 0.5
+        pt_C1 = self.yes_is_1(self._get_col_value("C1", row))
+        pt_C2 = self.yes_is_1(self._get_col_value("C2", row))
+        pt_C3 = self.yes_is_1(self._get_col_value("C3", row))
+        pt_C4 = self.yes_is_1(self._get_col_value("C4", row))
+        pt_C5 = self.yes_is_1(self._get_col_value("C5", row)) * 0.5
+        pt_C6 = self.yes_is_1(self._get_col_value("C6", row)) * 0.5
+        pt_C7 = self.yes_is_1(self._get_col_value("C7", row)) * 0.5
+        pt_C8 = self.yes_is_1(self._get_col_value("C8", row)) * 0.5
+        pt_C9 = self.yes_is_1(self._get_col_value("C9", row))
+        pt_C10 = self.no_is_1(self._get_col_value("C10", row)) * 0.5
+        pt_C11 = self.no_is_1(self._get_col_value("C11", row)) * 0.5
         #C12 - C38 # TODO need clarification
 
-        return C1 + C2 + C3 + C4 + C5 + C6 + C7 + C8 + C9 + C10 + C11
+        val_cooking = self.is_cooking_school(row)
+        dtl_pilchards = self._get_col_value("C12b", row)
+
+        return pt_C1 + pt_C2 + pt_C3 + pt_C4 + pt_C5 + pt_C6 + pt_C7 + pt_C8 + pt_C9 + pt_C10 + pt_C11
 
     def staff_points(self, row):
-        F1 = self.yes_is_1(self._get_col_value("F1", row))
-        F3 = self.yes_is_1(self._get_col_value("F3", row))
-        F4 = self.yes_is_1(self._get_col_value("F4", row))
-        F5 = self.yes_is_1(self._get_col_value("F5", row))
-        F6 = self.yes_is_1(self._get_col_value("F6", row))
-        F7 = self.yes_is_1(self._get_col_value("F7", row)) * 0.5
-        F8 = self.yes_is_1(self._get_col_value("F8", row)) * 0.5
+        def score_rating(x):
+            x = int(x)
+            if x >= 5: return 1
+            if x >= 3: return 0.5
+            return 0
+            
+        pt_F1 = self.yes_is_1(self._get_col_value("F1", row))
+        pt_F3 = self.yes_is_1(self._get_col_value("F3", row))
+        pt_F4 = self.yes_is_1(self._get_col_value("F4", row))
+        pt_F5 = self.yes_is_1(self._get_col_value("F5", row))
+        pt_F6 = self.yes_is_1(self._get_col_value("F6", row))
+        pt_F7 = self.yes_is_1(self._get_col_value("F7", row)) * 0.5
+        pt_F8 = self.yes_is_1(self._get_col_value("F8", row)) * 0.5
+        pt_G1 = score_rating(self._get_col_value("G1", row))
+        pt_G2 = score_rating(self._get_col_value("G2", row))
+        pt_G3 = score_rating(self._get_col_value("G3", row))
+        pt_G4 = score_rating(self._get_col_value("G4", row))
 
-        return F1 + F3 + F4 + F5 + F6 + F7 + F8
+        return sum([
+            pt_F1, pt_F3, pt_F4, pt_F5, pt_F6, pt_F7, pt_F8, 
+            pt_G1, pt_G2, pt_G3, pt_G4
+        ])
 
 re_qnum = re.compile("^(Timestamp|Verification Sch Number|[A-Z]\d+[a-z]?.).*")
 def extract_header(header):
