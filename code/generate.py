@@ -1,11 +1,11 @@
 import math
+import sys
 import itertools
 import sys
 from xml.dom import minidom
 import datetime
 import re
 import os
-import tablib
 import xlrd
 from mx.DateTime import Time, strptime
 from collections import OrderedDict, defaultdict
@@ -91,7 +91,7 @@ class SchoolData(object):
         pt_D5 = self.yes_is_1(self._get_col_value("D5"))
         pt_D6 = self.no_is_1(self._get_col_value("D6"))
 
-        time_1030 = Time(10, 30)
+        time_1030 = datetime.time(10, 30)
         pt_D7a = 2 if self._get_col_value("D7a") < time_1030 else 0
         diff = self._get_col_value("D7b") - self._get_col_value("D7a")
         pt_D7b = 1 if diff.minutes < 30 else 0
@@ -432,6 +432,10 @@ def render_scorecard(all_data, school, template_xml):
     return template_xml
 
 def main(args):
+    if len(args) not in [3, 5]:
+        sys.stderr.write("Usage: %s <data file> <visit number> [year] [month]\n" % args[0])
+        sys.exit(1)
+
     filename = args[1]
     visit = args[2]
     if len(args) == 5:
