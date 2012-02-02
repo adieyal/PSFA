@@ -50,4 +50,4 @@ def rank(x):
 
 def mean(vals):
     if len(vals) == 0: return 0
-    return sum(vals) / len(vals)
+    return float(sum(vals)) / len(vals)
