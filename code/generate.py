@@ -215,7 +215,7 @@ class SchoolData(object):
 
     @property
     def name(self):
-        return self.A1
+        return school_map[self.school_number]["schoolname"]
 
     @property
     def school_number(self):
@@ -223,7 +223,7 @@ class SchoolData(object):
 
     @property
     def school_type(self):
-        return school_map[self.school_number]
+        return school_map[self.school_number]["school_type"]
 
     @property
     def visit_date(self):
@@ -435,8 +435,11 @@ def load_schooltypes(filename):
     headers = sheet.row_values(0)
     
     for row_num in range(1, sheet.nrows):
-        school_num, school_type = sheet.row_values(row_num)
-        school_map[int(school_num)] = "Primary" if int(school_type) == 1 else "Secondary"
+        row = sheet.row_values(row_num)
+        data = dict(zip(headers, row))
+        school_num = int(data["schoolnumber"])
+        data["school_type"] = "Primary" if int(data["primary_school"]) == 1 else "Secondary"
+        school_map[school_num] = data
 
 def load_menu(filename):
     xls = xlrd.open_workbook(filename)
