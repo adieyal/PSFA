@@ -26,7 +26,7 @@ deviation_map = {
     "D6" : "Reduce the amount of food waste",
     "meal_served_on_time" : "Serve meal at the correct time",
     "meal_served_efficiently" : "Serve meal efficiently so not to waste class time",
-    "ind_food_deviations" : "Serve correct amounts of menu items",
+    "food_deviations" : "Serve correct amounts of menu items",
     "E3" : "Ensure that surface used to prepare food is clean",
     "E4" : "Ensure that floor in kitchen is clean",
     "E5" : "Ensure that cleaning materials are available",
@@ -46,7 +46,7 @@ deviation_map = {
     "C9" : "Rotate the stock to avoid wastage",
     "C10" : "Notify PSFA in a timely manner when gas is needed",
     "C11" : "Notify PSFA in timely manner if there is a shortage of food",
-    #"E12" : "Ration your supplies appropriately",
+    "staples_in_stock" : "Ration your supplies appropriately",
     "F1" : "Limit days when volunteers are absent",
     "F3" : "Monitor stock control on daily basis",
     "F4" : "Keep volunteer honorarium up to date",
@@ -142,7 +142,7 @@ class SchoolData(object):
             "D7a", "D7b"
         ],
         "is_int" : [
-            "B3",
+            "B3", "B6",
             "G1", "G2", "G3", "G4",
         ],
         "is_float" : [
@@ -175,7 +175,6 @@ class SchoolData(object):
         
     def _get_col_value(self, prefix):
         data = dict(zip(self.headers, self.data_row))
-        print data["A3"]
         return data[prefix]
 
     def yes_is_1(self, val):
@@ -208,7 +207,7 @@ class SchoolData(object):
 
     @property
     def is_cooking_school(self):
-        return "cooking" if self.B7 == "Cooking" else "non-cooking"
+        return self.B7 == "Cooking"
 
     @property
     def voluteers_interviewed(self):
@@ -233,9 +232,19 @@ class SchoolData(object):
     @property
     def all_stock(self):
         if self.is_cooking_school:
-            all_stock = ["C12", "C13", "C14", "C15", "C16", "C17", "C18"]
+            all_stock = [
+                ("Pilchards", "C12"), 
+                ("Rice", "C13"), 
+                ("Curry Mince", "C14"), 
+                ("Savoury Mince", "C15"),
+                ("Samp", "C16"), 
+                ("Sugar beans", "C17"), 
+                ("Brown lentils", "C18")]
         else:
-            all_stock = ["C24", "C25"]
+            all_stock = [
+                ("Jam", "C24"), 
+                ("Peanut butter", "C25")
+            ]
         return all_stock
 
     @property
@@ -253,9 +262,17 @@ class SchoolData(object):
         return self.D7a < time_1030
 
     @property
+    def ind_meal_served_on_time(self):
+        return 2 if self.meal_served_on_time else 0
+
+    @property
     def meal_served_efficiently(self):
         diff = self.D7b - self.D7a
         return diff.minutes < 30
+
+    @property
+    def ind_meal_served_efficiently(self):
+        return 1 if self.meal_served_efficiently else 0
 
     @property
     def food_in_good_condition(self):
@@ -263,7 +280,7 @@ class SchoolData(object):
 
     @property
     def menu(self):
-        menu_name = "%s %s schools" % (self.school_type, self.is_cooking_school)
+        menu_name = "%s %s schools" % (self.school_type, "cooking" if self.is_cooking_school else "non-cooking")
         return menus[menu_name]
 
     @property
@@ -308,12 +325,9 @@ class SchoolData(object):
         
     @property
     def meal_delivery_score(self):
-        pt_D7a = 2 if self.meal_served_on_time else 0
-        pt_D7b = 1 if self.meal_served_efficiently else 0
-        pt_ranges = self.ind_food_deviations
-
         return float(sum([
-            self.D1, self.D3, self.D4, self.D5, self.D6, pt_D7a, pt_D7b, pt_ranges
+            self.D1, self.D3, self.D4, self.D5, self.D6, 
+            self.ind_meal_served_on_time, self.ind_meal_served_efficiently, self.ind_food_deviations
         ]))
 
     @property
@@ -327,17 +341,35 @@ class SchoolData(object):
         ])
 
     @property
+    def staples_in_stock(self):
+        all_stock = self.all_stock
+        days_left = self.B6
+        weeks_left = days_left / 5.0
+
+        stock_surpluses = []
+        for (ingredient, indicator) in self.all_stock:
+            available_stock_days = getattr(self, "%sb" % indicator)
+            feeding_days_per_week = sum([1 for x in self.menu[ingredient].values() if x > 0])
+            required_stock_days = feeding_days_per_week * weeks_left
+            surplus_stock_days = available_stock_days - required_stock_days
+            
+            stock_surpluses.append((ingredient, surplus_stock_days >= 0))
+        return all([x[1] for x in stock_surpluses])
+
+    @property
+    def ind_staples_in_stock(self):
+        return 2 if self.staples_in_stock else 0
+
+    @property
     def stock_score(self):
-        ind1 = sum([
+        return sum([
             self.C1, self.C2, self.C3, self.C4, self.C9,
             self.C5 * 0.5, self.C6 * 0.5, self.C7 * 0.5, self.C8 * 0.5,
-            self.C10 * 0.5, self.C11 * 0.5
+            self.C10 * 0.5, self.C11 * 0.5,
+            self.ind_staples_in_stock
         ])
+        return ind1 + ind2
 
-        #C12 - C38 # TODO need clarification
-        all_stock = self.all_stock
-
-        return ind1 + 0
 
     @property
     def staff_score(self):
@@ -347,7 +379,7 @@ class SchoolData(object):
             self.score_rating(self.G3), self.score_rating(self.G4), 
         ])
 
-re_qnum = re.compile("^(Timestamp|Verification Sch Number|[A-Z]\d+[a-z]?).*")
+re_qnum = re.compile("^(Timestamp|Verification Sch Number|[A-Z]\d+[a-z]?.).*")
 def extract_header(header):
     match = re_qnum.match(header)
     if match:
@@ -411,12 +443,15 @@ def load_menu(filename):
     for i in range(4):
         sheet = xls.sheets()[i]
 
-        headers = sheet.row_values(1)
+        # skip first two columns
+        headers = sheet.row_values(1)[2:]
         items = {} 
         for row_num in range(2, sheet.nrows):
             row = sheet.row_values(row_num)
-            datum = dict(zip(headers, row))
-            items[datum["Item"]] = datum
+            ingredient = row[0]
+
+            datum = dict(zip(headers, row[2:]))
+            items[ingredient] = datum
         menus[sheet.name] = items
 
 def generate_graph(xml, prefix, val, width=19.407):
@@ -522,9 +557,9 @@ def render_scorecard(all_data, school, template_xml):
         ("D4", calc_deviation("D4")),
         ("D5", calc_deviation("D5")),
         ("D6", calc_deviation("D6")),
-        ("meal_served_on_time", calc_deviation("meal_served_on_time"), 2),
-        ("meal_served_efficiently", calc_deviation("meal_served_efficiently")),
-        ("ind_food_deviations", calc_deviation("ind_food_deviations"), 2),
+        ("meal_served_on_time", calc_deviation("ind_meal_served_on_time"), 2),
+        ("meal_served_efficiently", calc_deviation("ind_meal_served_efficiently")),
+        ("food_deviations", calc_deviation("ind_food_deviations"), 2),
     ], key=lambda x: x[1]) 
 
     safety_deviations = sorted([
@@ -550,6 +585,7 @@ def render_scorecard(all_data, school, template_xml):
         ("C9", calc_deviation("C9")),
         ("C10", calc_deviation("C10"), 0.5),
         ("C11", calc_deviation("C11"), 0.5),
+        ("staples_in_stock", calc_deviation("ind_staples_in_stock"), 2),
     ], key=lambda x: x[1]) 
     print "Don't forget to fix the stock_deviations"
 
