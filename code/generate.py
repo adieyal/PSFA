@@ -13,6 +13,7 @@ from collections import OrderedDict, defaultdict
 import processutils
 import stats
 from processutils import xmlutils
+from specialint import SpecialInt
 
 school_map = {}
 menus = {}
@@ -25,7 +26,7 @@ deviation_map = {
     "D6" : "Reduce the amount of food waste",
     "meal_served_on_time" : "Serve meal at the correct time",
     "meal_served_efficiently" : "Serve meal efficiently so not to waste class time",
-    "D8" : "Serve correct amounts of menu items",
+    "ind_food_deviations" : "Serve correct amounts of menu items",
     "E3" : "Ensure that surface used to prepare food is clean",
     "E4" : "Ensure that floor in kitchen is clean",
     "E5" : "Ensure that cleaning materials are available",
@@ -46,8 +47,49 @@ deviation_map = {
     "C10" : "Notify PSFA in a timely manner when gas is needed",
     "C11" : "Notify PSFA in timely manner if there is a shortage of food",
     #"E12" : "Ration your supplies appropriately",
+    "F1" : "Limit days when volunteers are absent",
+    "F3" : "Monitor stock control on daily basis",
+    "F4" : "Keep volunteer honorarium up to date",
+    "F5" : "Display NSNP posters so visible to volunteers",
+    "F6" : "Encourage all volunteers to participate",
+    "F7" : "Improve communication with school coordinator",
+    "G1" : "Try to better motivate school feeding volunteers", # TODO how to do this
+    "G2" : "Encourage involvement of school coordinator",# TODO how to do this
+    "G3" : "Encourage involvement of principal",# TODO how to do this
+    "G4" : "Improve interaction between volunteers and students",# TODO how to do this
 }
 
+day_of_week = {
+    0 : "Monday",
+    1 : "Tuesday",
+    2 : "Wednesday",
+    3 : "Thursday",
+    4 : "Friday",
+    5 : "Saturday",
+    6 : "Sunday",
+}
+
+ingredient_qtys = {
+    "Pilchards" : 1.88,
+    "Rice" : 10,
+    "Savoury Mince" : 10,
+    "Curry Mince" : 10,
+    "Samp" : 10,
+    "Sugar beans" : 5,
+    "Brown lentils" : 0.5,
+    "Breyani spice" : 1,
+    "Cabbage" : 3,
+    "Carrots" : 5,
+    "Butternut" : 5,
+    "Fruits" : 0.15,
+    "Peanut butter" : 5,
+    "Jam" : 3.75,
+    "Baked beans" : 3,
+    "Jungle oats" : 1,
+    "Salt" : 1,
+    "Oil" : 4,
+    "Sugar" : 10,
+}
 
 def memoize(fn):
     def _fn(self, *args, **kwargs):
@@ -87,7 +129,7 @@ class SchoolData(object):
             "C1", "C2", "C3", "C4", "C5", "C6", "C7", "C8", "C9",
             "D1", "D3", "D4", "D5", 
             "E2", "E3", "E4", "E5", "E6", "E7", "E8", "E9", "E10", "E11", "E12", "E13",
-            "F1", "F3", "F4", "F5", "F6", "F7", 
+            "F1", "F3", "F4", "F5", "F6", "F7", "F8",
         ],
         "no_is_1" : [
             "C10", "C11",
@@ -98,7 +140,14 @@ class SchoolData(object):
         ],
         "is_time" : [
             "D7a", "D7b"
-        ]
+        ],
+        "is_int" : [
+            "B3",
+            "G1", "G2", "G3", "G4",
+        ],
+        "is_float" : [
+            "D8b", "D9b", "D10b", "D11b", "D12b", "D13b",
+        ],
     }
 
     def __init__(self, data_row, headers, xls_datemode):
@@ -109,33 +158,61 @@ class SchoolData(object):
         self.headers = headers
 
     def __getattr__(self, key):
-        if not key in self.__dict__:
-            val = self._get_col_value(key)
-            if key in SchoolData.field_types["yes_is_1"]:
-                return self.yes_is_1(val)
-            elif key in SchoolData.field_types["no_is_1"]:
-                return self.no_is_1(val)
-            elif key in SchoolData.field_types["is_date"]:
-                return strptime(val, "%d.%m.%Y")
-            elif key in SchoolData.field_types["is_time"]:
-                return parse_willa_time(val, self.xls_datemode)
-            return val
-        else:
-            return self.__dict__[key]
+        val = self._get_col_value(key)
+        if key in SchoolData.field_types["yes_is_1"]:
+            return SpecialInt(self.yes_is_1(val))
+        elif key in SchoolData.field_types["no_is_1"]:
+            return SpecialInt(self.no_is_1(val))
+        elif key in SchoolData.field_types["is_date"]:
+            return strptime(val, "%d.%m.%Y")
+        elif key in SchoolData.field_types["is_time"]:
+            return parse_willa_time(val, self.xls_datemode)
+        elif key in SchoolData.field_types["is_int"]:
+            return SpecialInt(self.parse_int(val))
+        elif key in SchoolData.field_types["is_float"]:
+            return float(val)
+        return val
         
     def _get_col_value(self, prefix):
         data = dict(zip(self.headers, self.data_row))
+        print data["A3"]
         return data[prefix]
 
     def yes_is_1(self, val):
+        if self.is_no_response(val):
+            if self.voluteers_interviewed:
+                return self.yes_is_1("no")
+            return None
         return 1 if val.lower().strip() == "yes" else 0
 
     def no_is_1(self, val):
+        if self.is_no_response(val):
+            if self.voluteers_interviewed:
+                return self.no_is_1("no")
+            return None
         return 1 if val.lower().strip() == "no" else 0
+
+    def parse_int(self, val):
+        if self.is_no_response(val):
+            return None
+        return int(val)
+
+    def is_no_response(self, val):
+        return val in ["Didn't answer", ""]
+
+    def score_rating(self, x):
+        if x == None: return x
+
+        if x >= 5: return 1
+        return 0
 
     @property
     def is_cooking_school(self):
         return "cooking" if self.B7 == "Cooking" else "non-cooking"
+
+    @property
+    def voluteers_interviewed(self):
+        return "Volunteers (VOL)" in self.A10
 
     @property
     def name(self):
@@ -146,11 +223,22 @@ class SchoolData(object):
         return int(self.A3)
 
     @property
+    def school_type(self):
+        return school_map[self.school_number]
+
+    @property
     def visit_date(self):
         return self.A5
 
     @property
-    @memoize
+    def all_stock(self):
+        if self.is_cooking_school:
+            all_stock = ["C12", "C13", "C14", "C15", "C16", "C17", "C18"]
+        else:
+            all_stock = ["C24", "C25"]
+        return all_stock
+
+    @property
     def total_score(self):
         delivery = self.meal_delivery_score
         safety = self.hygiene_score
@@ -168,73 +256,47 @@ class SchoolData(object):
     def meal_served_efficiently(self):
         diff = self.D7b - self.D7a
         return diff.minutes < 30
-        
+
     @property
-    @memoize
-    def meal_delivery_score(self):
-        pt_D1 = self.D1
-        pt_D3 = self.D3
-        pt_D4 = self.D4
-        pt_D5 = self.D5
-        pt_D6 = self.D6
+    def food_in_good_condition(self):
+        return (self.C5 + self.C6 + self.C7 + self.C8) * 0.5
 
-        pt_D7a = 2 if self.meal_served_on_time else 0
-        pt_D7b = 1 if self.meal_served_efficiently else 0
-        val_cooking = self.is_cooking_school
-        val_school_num = int(self.A3)
-        val_school_type = school_map[val_school_num]
-        val_total_fed = int(self.B3)
+    @property
+    def menu(self):
+        menu_name = "%s %s schools" % (self.school_type, self.is_cooking_school)
+        return menus[menu_name]
+
+    @property
+    def food_deviations(self):
+        val_total_fed = self.B3
         val_date_of_visit = self.visit_date
-        dow = {
-            0 : "Monday",
-            1 : "Tuesday",
-            2 : "Wednesday",
-            3 : "Thursday",
-            4 : "Friday",
-            5 : "Saturday",
-            6 : "Sunday",
-        }
-        val_day_of_visit = dow[val_date_of_visit.weekday()]
-        menu_name = "%s %s schools" % (val_school_type, val_cooking)
-        menu = menus[menu_name]
-
-        ingredient_qtys = {
-            "Pilchards" : 1.88,
-            "Rice" : 10,
-            "Savoury Mince" : 10,
-            "Curry Mince" : 10,
-            "Samp" : 10,
-            "Sugar beans" : 5,
-            "Brown lentils" : 500,
-            "Breyani spice" : 1,
-            "Cabbage" : 3,
-            "Carrots" : 5,
-            "Butternut" : 5,
-            "Fruits" : 10,
-            "Peanut butter" : 5,
-            "Jam" : 3.75,
-            "Baked beans" : 3,
-            "Jungle oats" : 1,
-            "Salt" : 1,
-            "Oil" : 4,
-            "Sugar" : 10,
-        }
+        val_day_of_visit = day_of_week[val_date_of_visit.weekday()]
 
         ranges = [] 
         for field_idx in range(8, 14):
-            item_type_field = "D%da" % field_idx
-            item_qty_field = "D%db" % field_idx
+            ingredient_type_field = "D%da" % field_idx
+            ingredient_qty_field = "D%db" % field_idx
 
-            item = getattr(self, item_type_field)
-            qty = ingredient_qtys[item]
-            amount_needed = val_total_fed * menu[item][val_day_of_visit]
-            amount_served = float(hasattr(self, item_qty_field)) * qty
-            if amount_needed == 0:
-                range_perc = 0
-            else:
-                range_perc = abs(amount_served - amount_needed) / amount_needed
-            ranges.append(range_perc)
-            
+            ingredient = getattr(self, ingredient_type_field)
+
+            # Don't look at ingredients that are not on the menu
+            if ingredient in self.menu:
+                ingredient_pack_qty = ingredient_qtys[ingredient]
+                amount_needed = val_total_fed * self.menu[ingredient][val_day_of_visit]
+                amount_served = getattr(self, ingredient_qty_field) * ingredient_pack_qty
+                if amount_needed == 0:
+                    range_perc = 0
+                else:
+                    range_perc = abs(amount_served - amount_needed) / amount_needed
+
+                # Don't include deviations where a quantity served is 0
+                if amount_served > 0:
+                    ranges.append((ingredient, range_perc))
+        return ranges
+
+    @property
+    def ind_food_deviations(self):
+        ranges = self.food_deviations 
         ranges_below_10 = [range_perc for range_perc in ranges if range_perc < 0.1]
         if len(ranges_below_10) == len(ranges):
             pt_ranges = 2
@@ -242,79 +304,50 @@ class SchoolData(object):
             pt_ranges = 1
         else:
             pt_ranges = 0
+        return pt_ranges
+        
+    @property
+    def meal_delivery_score(self):
+        pt_D7a = 2 if self.meal_served_on_time else 0
+        pt_D7b = 1 if self.meal_served_efficiently else 0
+        pt_ranges = self.ind_food_deviations
 
         return float(sum([
-            pt_D1, pt_D3, pt_D4, pt_D5, pt_D6, pt_D7a, pt_D7b, pt_ranges
+            self.D1, self.D3, self.D4, self.D5, self.D6, pt_D7a, pt_D7b, pt_ranges
         ]))
 
     @property
-    @memoize
     def hygiene_score(self):
-        pt_E2 = self.E2
-        pt_E3 = self.E3
-        pt_E4 = self.E4
-        pt_E5 = self.E5
-        pt_E6 = self.E6
-        pt_E10 = self.E10 * 0.5
-        pt_E11 = self.E11 * 0.5
-
-        # 1 point if E5=NO, but E6=YES
-        if pt_E5 == 0 and pt_E6 == 1:
-            pt_E5 = 1
-
-        return pt_E2 + pt_E3 + pt_E4 + pt_E5 + pt_E10 + pt_E11
+        return sum([
+            self.E2, self.E3, self.E4, self.E5,
+            self.E7, self.E8, self.E9, 
+            self.E12, self.E13, 
+            self.E10 * 0.5, self.E11 * 0.5,
+            1 if (self.E5 == 0 and self.E6 == 1) else 0
+        ])
 
     @property
-    @memoize
     def stock_score(self):
-        pt_C1 = self.C1
-        pt_C2 = self.C2
-        pt_C3 = self.C3
-        pt_C4 = self.C4
-        pt_C5 = self.C5 * 0.5
-        pt_C6 = self.C6 * 0.5
-        pt_C7 = self.C7 * 0.5
-        pt_C8 = self.C8 * 0.5
-        pt_C9 = self.C9
-        pt_C10 = self.C10 * 0.5
-        pt_C11 = self.C11 * 0.5
-        #C12 - C38 # TODO need clarification
-
-        val_cooking = self.is_cooking_school
-        dtl_pilchards = self.C12b
-
-        return sum([
-            pt_C1, pt_C2, pt_C3, pt_C4, pt_C5, 
-            pt_C6, pt_C7, pt_C8, pt_C9, pt_C10, 
-            pt_C11
+        ind1 = sum([
+            self.C1, self.C2, self.C3, self.C4, self.C9,
+            self.C5 * 0.5, self.C6 * 0.5, self.C7 * 0.5, self.C8 * 0.5,
+            self.C10 * 0.5, self.C11 * 0.5
         ])
+
+        #C12 - C38 # TODO need clarification
+        all_stock = self.all_stock
+
+        return ind1 + 0
 
     @property
-    @memoize
     def staff_score(self):
-        def score_rating(x):
-            x = int(x)
-            if x >= 5: return 1
-            if x >= 3: return 0.5
-            return 0
-            
-        pt_F1 = self.F1
-        pt_F3 = self.F3
-        pt_F4 = self.F4
-        pt_F5 = self.F5
-        pt_F6 = self.F6
-        pt_F7 = self.F7
-        pt_G1 = score_rating(self.G1)
-        pt_G2 = score_rating(self.G2)
-        pt_G3 = score_rating(self.G3)
-        pt_G4 = score_rating(self.G4)
-
         return sum([
-            pt_F1, pt_F3, pt_F4, pt_F5, pt_F6, pt_F7, 
-            pt_G1, pt_G2, pt_G3, pt_G4
+            self.F1, self.F3, self.F4, self.F5, self. F6, self.F7,
+            self.score_rating(self.G1), self.score_rating(self.G2), 
+            self.score_rating(self.G3), self.score_rating(self.G4), 
         ])
 
-re_qnum = re.compile("^(Timestamp|Verification Sch Number|[A-Z]\d+[a-z]?.).*")
+re_qnum = re.compile("^(Timestamp|Verification Sch Number|[A-Z]\d+[a-z]?).*")
 def extract_header(header):
     match = re_qnum.match(header)
     if match:
@@ -479,9 +512,9 @@ def render_scorecard(all_data, school, template_xml):
     not_my_school_year = [s for s in avg_data.values() if s.school_number != school.school_number]
     _, _, year_rank_total = mean_percentile_rank(my_yearly_avg.total_score, [s.total_score for s in not_my_school_year])
 
-    def calc_deviation(key):
-        return getattr(visit_average, key) - getattr(school, key)
-    avg_c1 = calc_deviation("C1")
+    def calc_deviation(key, norm_value=1):
+        deviation = getattr(visit_average, key) - getattr(school, key)
+        return deviation / norm_value
 
     service_deviations = sorted([
         ("D1", calc_deviation("D1")),
@@ -489,10 +522,10 @@ def render_scorecard(all_data, school, template_xml):
         ("D4", calc_deviation("D4")),
         ("D5", calc_deviation("D5")),
         ("D6", calc_deviation("D6")),
-        ("meal_served_on_time", calc_deviation("meal_served_on_time")),
+        ("meal_served_on_time", calc_deviation("meal_served_on_time"), 2),
         ("meal_served_efficiently", calc_deviation("meal_served_efficiently")),
+        ("ind_food_deviations", calc_deviation("ind_food_deviations"), 2),
     ], key=lambda x: x[1]) 
-    print "Don't forget to fix the service_deviations"
 
     safety_deviations = sorted([
         ("E3", calc_deviation("E3")),
@@ -502,13 +535,40 @@ def render_scorecard(all_data, school, template_xml):
         ("E7", calc_deviation("E7")),
         ("E8", calc_deviation("E8")),
         ("E9", calc_deviation("E9")),
-        ("E10", calc_deviation("E10")),
-        ("E11", calc_deviation("E11")),
+        ("E10", calc_deviation("E10"), 0.5),
+        ("E11", calc_deviation("E11"), 0.5),
         ("E12", calc_deviation("E12")),
         ("E13", calc_deviation("E13")),
     ], key=lambda x: x[1]) 
+
+    stock_deviations = sorted([
+        ("C1", calc_deviation("C3")),
+        ("C2", calc_deviation("C4")),
+        ("C3", calc_deviation("C5")),
+        ("C4", calc_deviation("C6")),
+        ("food_in_good_condition", calc_deviation("food_in_good_condition"), 2),
+        ("C9", calc_deviation("C9")),
+        ("C10", calc_deviation("C10"), 0.5),
+        ("C11", calc_deviation("C11"), 0.5),
+    ], key=lambda x: x[1]) 
+    print "Don't forget to fix the stock_deviations"
+
+    staff_deviations = sorted([
+        ("F1", calc_deviation("F1")),
+        ("F3", calc_deviation("F3")),
+        ("F4", calc_deviation("F4")),
+        ("F5", calc_deviation("F5")),
+        ("F6", calc_deviation("F6")),
+        ("F7", calc_deviation("F7")),
+        ("G1", calc_deviation("G1")),
+        ("G2", calc_deviation("G2")),
+        ("G3", calc_deviation("G3")),
+        ("G4", calc_deviation("G4")),
+    ], key=lambda x: x[1]) 
     print deviation_map[service_deviations[-1][0]]
     print deviation_map[safety_deviations[-1][0]]
+    print deviation_map[stock_deviations[-1][0]]
+    print deviation_map[staff_deviations[-1][0]]
 
     context = {
         "s_name" : school.name,
@@ -529,7 +589,9 @@ def render_scorecard(all_data, school, template_xml):
         "year_rank_total" : str(int(year_rank_total)),
         "year_rank_total_str" : stringify_rank(int(year_rank_total)),
         "service_tip" : deviation_map[service_deviations[-1][0]],
-        "safety_tip" : deviation_map[service_deviations[-1][0]],
+        "safety_tip" : deviation_map[safety_deviations[-1][0]],
+        "stock_tip" : deviation_map[stock_deviations[-1][0]],
+        "staff_tip" : deviation_map[staff_deviations[-1][0]],
     }
     template_xml = processutils.process_svg_template(context, template_xml)
     xml = minidom.parseString(template_xml.encode("utf-8"))
