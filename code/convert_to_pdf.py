@@ -7,7 +7,7 @@ for path, _, files in os.walk("output"):
         if f.endswith(".svg"):
             in_path = os.path.join(path, f)
             out_path = os.path.join(path, f.replace(".svg", ".pdf"))
-            print "Converting: %s > %s" % (in_path, out_path)
-            inkscape("-A", "/tmp/crap.pdf", in_path )
+            print "Converting: %s -> %s" % (in_path, out_path)
+            inkscape("-A", out_path, in_path)
 
             
