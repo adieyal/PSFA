@@ -91,28 +91,10 @@ ingredient_qtys = {
     "Sugar" : 10,
 }
 
-def memoize(fn):
-    def _fn(self, *args, **kwargs):
-        #if not hasattr(self, "_cache"):
-        #    self._cache = {}
-        #if fn in self._cache:
-        #    return self._cache[fn]
-        res = fn(self, *args, **kwargs)
-        #self._cache[fn] = res
-        return res
-    return _fn
-
-def invalidates_cache(fn):
-    def _fn(self, *args, **kwargs):
-        self._cache = {}
-        return fn(self, *args, **kwargs)
-    return _fn
-
 class AvgSchoolData(object):
     def __init__(self, school_datas=None):
         self._school_datas = school_datas or []
 
-    #@invalidates_cache
     def add_observation(self, school_data):
         self._school_datas.append(school_data)
 
@@ -126,13 +108,13 @@ class AvgSchoolData(object):
 class SchoolData(object):
     field_types = {
         "yes_is_1" : [
-            "C1", "C2", "C3", "C4", "C5", "C6", "C7", "C8", "C9",
+            "C1", "C2", "C4", "C5", "C6", "C7", "C8", "C9",
             "D1", "D3", "D4", "D5", 
             "E2", "E3", "E4", "E5", "E6", "E7", "E8", "E9", "E10", "E11", "E12", "E13",
             "F1", "F3", "F4", "F5", "F6", "F7", "F8",
         ],
         "no_is_1" : [
-            "C10", "C11",
+            "C3", "C10", "C11",
             "D6",
         ],
         "is_date" : [
@@ -156,6 +138,7 @@ class SchoolData(object):
         # to pre-parse the data outside of the class either
         self.xls_datemode = xls_datemode
         self.headers = headers
+        self._data = dict(zip(self.headers, self.data_row))
 
     def __getattr__(self, key):
         val = self._get_col_value(key)
@@ -166,7 +149,7 @@ class SchoolData(object):
         elif key in SchoolData.field_types["is_date"]:
             return strptime(val, "%d.%m.%Y")
         elif key in SchoolData.field_types["is_time"]:
-            return parse_willa_time(val, self.xls_datemode)
+            return self.parse_time(val)
         elif key in SchoolData.field_types["is_int"]:
             return SpecialInt(self.parse_int(val))
         elif key in SchoolData.field_types["is_float"]:
@@ -174,8 +157,7 @@ class SchoolData(object):
         return val
         
     def _get_col_value(self, prefix):
-        data = dict(zip(self.headers, self.data_row))
-        return data[prefix]
+        return self._data[prefix]
 
     def yes_is_1(self, val):
         if self.is_no_response(val):
@@ -196,8 +178,13 @@ class SchoolData(object):
             return None
         return int(val)
 
+    def parse_time(self, val):
+        if self.is_no_response(val):
+            return None
+        return parse_willa_time(val, self.xls_datemode)
+
     def is_no_response(self, val):
-        return val in ["Didn't answer", ""]
+        return val in ["Didn't answer", "", "None"]
 
     def score_rating(self, x):
         if x == None: return x
@@ -263,10 +250,14 @@ class SchoolData(object):
 
     @property
     def ind_meal_served_on_time(self):
+        if self.D7a == None:
+            return SpecialInt(None)
         return 2 if self.meal_served_on_time else 0
 
     @property
     def meal_served_efficiently(self):
+        if self.D7a == None:
+            return SpecialInt(None)
         diff = self.D7b - self.D7a
         return diff.minutes < 30
 
@@ -361,6 +352,22 @@ class SchoolData(object):
         return 2 if self.staples_in_stock else 0
 
     @property
+    def ind_G1(self):
+        return self.score_rating(self.G1)
+
+    @property
+    def ind_G2(self):
+        return self.score_rating(self.G1)
+
+    @property
+    def ind_G3(self):
+        return self.score_rating(self.G1)
+
+    @property
+    def ind_G4(self):
+        return self.score_rating(self.G1)
+
+    @property
     def stock_score(self):
         return sum([
             self.C1, self.C2, self.C3, self.C4, self.C9,
@@ -387,7 +394,7 @@ def extract_header(header):
         if h.endswith("."):
             h = h[0:-1]
         return h
-    print header, " IS NONE!!!"
+    #print header, " IS NONE!!!"
     return None
 
 def parse_willa_time(val, datemode):
@@ -418,6 +425,7 @@ def load_data(filename, visit, calc_year, calc_month):
         # Only collect results from this year and from january until the current month
         if school_data.visit_date.year != calc_year: continue
         if school_data.visit_date.month > calc_month: continue
+        if not school_data.school_number in school_map: continue
 
         if current_visit == visit:
             data["current_visit"].append(school_data)
@@ -439,6 +447,7 @@ def load_schooltypes(filename):
         data = dict(zip(headers, row))
         school_num = int(data["schoolnumber"])
         data["school_type"] = "Primary" if int(data["primary_school"]) == 1 else "Secondary"
+        data["score_card"] = int(data["score_card"])
         school_map[school_num] = data
 
 def load_menu(filename):
@@ -590,7 +599,6 @@ def render_scorecard(all_data, school, template_xml):
         ("C11", calc_deviation("C11"), 0.5),
         ("staples_in_stock", calc_deviation("ind_staples_in_stock"), 2),
     ], key=lambda x: x[1]) 
-    print "Don't forget to fix the stock_deviations"
 
     staff_deviations = sorted([
         ("F1", calc_deviation("F1")),
@@ -599,15 +607,11 @@ def render_scorecard(all_data, school, template_xml):
         ("F5", calc_deviation("F5")),
         ("F6", calc_deviation("F6")),
         ("F7", calc_deviation("F7")),
-        ("G1", calc_deviation("G1")),
-        ("G2", calc_deviation("G2")),
-        ("G3", calc_deviation("G3")),
-        ("G4", calc_deviation("G4")),
+        ("G1", calc_deviation("ind_G1")),
+        ("G2", calc_deviation("ind_G2")),
+        ("G3", calc_deviation("ind_G3")),
+        ("G4", calc_deviation("ind_G4")),
     ], key=lambda x: x[1]) 
-    print deviation_map[service_deviations[-1][0]]
-    print deviation_map[safety_deviations[-1][0]]
-    print deviation_map[stock_deviations[-1][0]]
-    print deviation_map[staff_deviations[-1][0]]
 
     context = {
         "s_name" : school.name,
@@ -631,6 +635,7 @@ def render_scorecard(all_data, school, template_xml):
         "safety_tip" : deviation_map[safety_deviations[-1][0]],
         "stock_tip" : deviation_map[stock_deviations[-1][0]],
         "staff_tip" : deviation_map[staff_deviations[-1][0]],
+        "num_schools" : str(len(avg_data) + 1),
     }
     template_xml = processutils.process_svg_template(context, template_xml)
     xml = minidom.parseString(template_xml.encode("utf-8"))
@@ -668,6 +673,11 @@ def main(args):
         calc_year = now.year
         calc_month = now.month
 
+    if not os.path.exists("output"):
+        os.mkdir("output")
+        os.mkdir("output/scorecard")
+        os.mkdir("output/noscorecard")
+
     # each school is either primary or secondary
     load_schooltypes("../resources/school_type.xls")
     # load the menus for primary and secondary coooking and non-cooking schools
@@ -680,10 +690,14 @@ def main(args):
 
     all_visit_data = all_data["current_visit"]
     for i, school in enumerate(all_visit_data):
+        print "Processing school: %s" % school.school_number
+
         school_xml = template_xml
         school_xml = render_scorecard(all_data, school, school_xml)
 
-        f = open("output/%d.svg" % i, "w")
+        output_path = "output/%s" % ("scorecard" if school_map[school.school_number]["score_card"] == 1 else "noscorecard")
+        output_file = "%d.svg" % school.school_number
+        f = open(os.path.join(output_path, output_file), "w")
         f.write(school_xml.encode("utf-8"))
         f.close()
 

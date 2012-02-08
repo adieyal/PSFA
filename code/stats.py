@@ -53,7 +53,3 @@ def mean(vals):
     # TODO - perhaps this isn't the best assumption?
     if len(real_vals) == 0: return 0
     return float(sum(real_vals)) / len(real_vals)
-
-def none_sum(lst):
-    return sum([el for el in lst if el != None])
-
