@@ -45,7 +45,7 @@ def rank(x):
     ordering = order(x)
     ranks = [0] * len(x)
     for i in range(L):
-        ranks[ordering[i]] = i
+        ranks[ordering[i]] = L - i + 1
     return ranks
 
 def mean(vals):
