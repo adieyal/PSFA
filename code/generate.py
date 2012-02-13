@@ -141,20 +141,25 @@ class SchoolData(object):
         self._data = dict(zip(self.headers, self.data_row))
 
     def __getattr__(self, key):
-        val = self._get_col_value(key)
-        if key in SchoolData.field_types["yes_is_1"]:
-            return SpecialInt(self.yes_is_1(val))
-        elif key in SchoolData.field_types["no_is_1"]:
-            return SpecialInt(self.no_is_1(val))
-        elif key in SchoolData.field_types["is_date"]:
-            return strptime(val, "%d.%m.%Y")
-        elif key in SchoolData.field_types["is_time"]:
-            return self.parse_time(val)
-        elif key in SchoolData.field_types["is_int"]:
-            return SpecialInt(self.parse_int(val))
-        elif key in SchoolData.field_types["is_float"]:
-            return float(val)
-        return val
+        try:
+            val = self._get_col_value(key)
+            if key in SchoolData.field_types["yes_is_1"]:
+                return SpecialInt(self.yes_is_1(val))
+            elif key in SchoolData.field_types["no_is_1"]:
+                return SpecialInt(self.no_is_1(val))
+            elif key in SchoolData.field_types["is_date"]:
+                #print key, val, self.school_number
+                return strptime(val.strip(), "%d.%m.%Y")
+            elif key in SchoolData.field_types["is_time"]:
+                return self.parse_time(val)
+            elif key in SchoolData.field_types["is_int"]:
+                return SpecialInt(self.parse_int(val))
+            elif key in SchoolData.field_types["is_float"]:
+                return float(val)
+            return val
+        except:
+            import traceback
+            traceback.print_exc()
         
     def _get_col_value(self, prefix):
         return self._data[prefix]
@@ -279,6 +284,8 @@ class SchoolData(object):
         val_total_fed = self.B3
         val_date_of_visit = self.visit_date
         val_day_of_visit = day_of_week[val_date_of_visit.weekday()]
+        if val_day_of_visit == "Saturday": val_day_of_visit = "Friday"
+        if val_day_of_visit == "Sunday": val_day_of_visit = "Monday"
 
         ranges = [] 
         for field_idx in range(8, 14):
@@ -662,6 +669,10 @@ def main(args):
     if len(args) not in [3, 5]:
         sys.stderr.write("Usage: %s <data file> <visit number> [year] [month]\n" % args[0])
         sys.exit(1)
+    code_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)))
+    project_root = os.path.join(code_dir, os.path.pardir)
+    resource_dir = os.path.join(project_root, "resources")
+    output_dir = os.path.join(project_root, "output")
 
     filename = args[1]
     visit = args[2]
@@ -673,17 +684,17 @@ def main(args):
         calc_year = now.year
         calc_month = now.month
 
-    if not os.path.exists("output"):
-        os.mkdir("output")
-        os.mkdir("output/scorecard")
-        os.mkdir("output/noscorecard")
+    if not os.path.exists(output_dir):
+        os.mkdir(output_dir)
+        os.mkdir(os.path.join(output_dir, "scorecard"))
+        os.mkdir(os.path.join(output_dir, "noscorecard"))
 
     # each school is either primary or secondary
-    load_schooltypes("../resources/school_type.xls")
+    load_schooltypes(os.path.join(resource_dir, "school_type.xls"))
     # load the menus for primary and secondary coooking and non-cooking schools
-    load_menu("../resources/menu.xls")
+    load_menu(os.path.join(resource_dir, "menu.xls"))
 
-    template_xml = open("../resources/scorecard.svg").read().decode("utf-8")
+    template_xml = open(os.path.join(resource_dir, "scorecard.svg")).read().decode("utf-8")
 
     # load all visit data
     all_data = load_data(filename, visit, calc_year, calc_month)
@@ -695,7 +706,7 @@ def main(args):
         school_xml = template_xml
         school_xml = render_scorecard(all_data, school, school_xml)
 
-        output_path = "output/%s" % ("scorecard" if school_map[school.school_number]["score_card"] == 1 else "noscorecard")
+        output_path = os.path.join(output_dir, "%s" % ("scorecard" if school_map[school.school_number]["score_card"] == 1 else "noscorecard"))
         output_file = "%d.svg" % school.school_number
         f = open(os.path.join(output_path, output_file), "w")
         f.write(school_xml.encode("utf-8"))
