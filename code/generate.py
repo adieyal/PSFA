@@ -530,13 +530,13 @@ def render_scorecard(all_data, school, template_xml):
         s_school_rank = str(school_rank)
         last_digit = s_school_rank[-1]
         if last_digit == "1":
-            return "%sst" % last_digit
+            return "%sst" % school_rank
         elif last_digit == "2":
-            return "%snd" % last_digit
+            return "%snd" % school_rank
         elif last_digit == "3":
-            return "%srd" % last_digit
+            return "%srd" % school_rank
         else:
-            return "%sth" % last_digit
+            return "%sth" % school_rank
                 
     visit_data = all_data["current_visit"]
 
@@ -694,7 +694,7 @@ def main(args):
     # load the menus for primary and secondary coooking and non-cooking schools
     load_menu(os.path.join(resource_dir, "menu.xls"))
 
-    template_xml = open(os.path.join(resource_dir, "scorecard.svg")).read().decode("utf-8")
+    template_xml = open(os.path.join(resource_dir, "scorecard2.svg")).read().decode("utf-8")
 
     # load all visit data
     all_data = load_data(filename, visit, calc_year, calc_month)
