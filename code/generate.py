@@ -185,7 +185,7 @@ class SchoolData(object):
 
     def parse_time(self, val):
         if self.is_no_response(val):
-            return None
+            return SpecialInt(None)
         return parse_willa_time(val, self.xls_datemode)
 
     def is_no_response(self, val):
@@ -261,7 +261,7 @@ class SchoolData(object):
 
     @property
     def meal_served_efficiently(self):
-        if self.D7a == None:
+        if self.D7a == None or self.D7b == None:
             return SpecialInt(None)
         diff = self.D7b - self.D7a
         return diff.minutes < 30
@@ -694,7 +694,7 @@ def main(args):
     # load the menus for primary and secondary coooking and non-cooking schools
     load_menu(os.path.join(resource_dir, "menu.xls"))
 
-    template_xml = open(os.path.join(resource_dir, "scorecard2.svg")).read().decode("utf-8")
+    template_xml = open(os.path.join(resource_dir, "scorecard.svg")).read().decode("utf-8")
 
     # load all visit data
     all_data = load_data(filename, visit, calc_year, calc_month)
