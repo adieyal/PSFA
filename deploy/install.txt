@@ -1,0 +1,13 @@
+# Download and install python
+http://python.org/ftp/python/2.7.2/python-2.7.2.msi
+
+# Download and install setup tools
+http://pypi.python.org/packages/2.7/s/setuptools/setuptools-0.6c11.win32-py2.7.exe#md5=57e1e64f6b7c7f1d2eddfc9746bbaf20
+
+# Download and install inkscape
+http://downloads.sourceforge.net/project/inkscape/inkscape/0.48.2/Inkscape-0.48.2-1-win32.exe?r=http%3A%2F%2Fsourceforge.net%2Fprojects%2Finkscape%2Ffiles%2F&ts=1331060551&use_mirror=tenet
+
+# Download and install the egenix package
+http://www.egenix.com/products/python/mxBase/
+
+# Install python requirements by running install.bat in the deploy directory
