@@ -184,8 +184,10 @@ class SchoolData(object):
                 return float(val)
             return val
         except:
-            import traceback
-            traceback.print_exc()
+            print "Could not understand the value in col: %s for %s" % (key, self.name)
+            sys.exit(1)
+            #import traceback
+            #traceback.print_exc()
         
     def _get_col_value(self, prefix):
         return self._data[prefix]
