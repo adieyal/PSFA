@@ -525,6 +525,10 @@ def generate_arrow_graph(xml, element_name, val, lbound, ubound):
     pos = lbound + adjustment
     n.setAttribute("transform", "translate(%s,0)" % pos)
 
+def remove_disclaimer(xml):
+    n = xmlutils.get_el_by_id(xml, "flowRoot", "disclaimer")
+    n.parentNode.removeChild(n)
+
 def render_scorecard(all_data, school, template_xml): 
 
     def mean_percentile_rank(val, vals):
@@ -702,6 +706,11 @@ def render_scorecard(all_data, school, template_xml):
     show_smiley_face(xml, "_safety", perc_safety)
     show_smiley_face(xml, "_stock", perc_stock)
     show_smiley_face(xml, "_staff", perc_staff)
+
+    print school
+    if not school.voluteers_interviewed: 
+        print "removed"
+        remove_disclaimer(xml)
     template_xml = xml.toxml()
     return template_xml
 
