@@ -174,7 +174,6 @@ class SchoolData(object):
             elif key in SchoolData.field_types["no_is_1"]:
                 return SpecialInt(self.no_is_1(val))
             elif key in SchoolData.field_types["is_date"]:
-                #print key, val, self.school_number
                 return strptime(val.strip(), "%d.%m.%Y")
             elif key in SchoolData.field_types["is_time"]:
                 return self.parse_time(val)
@@ -571,7 +570,7 @@ def render_scorecard(all_data, school, template_xml):
             return "%sth" % school_rank
                 
     stats_data = []
-    stats_data.append(school.name)
+    stats_data.append(school.school_number)
     stats_data.append(school.visit)
     stats_data.append(school.stock_score)
     stats_data.append(school.meal_delivery_score)
