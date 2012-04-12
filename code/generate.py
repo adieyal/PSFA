@@ -707,9 +707,7 @@ def render_scorecard(all_data, school, template_xml):
     show_smiley_face(xml, "_stock", perc_stock)
     show_smiley_face(xml, "_staff", perc_staff)
 
-    print school
     if not school.voluteers_interviewed: 
-        print "removed"
         remove_disclaimer(xml)
     template_xml = xml.toxml()
     return template_xml
@@ -743,7 +741,7 @@ def main(args):
     # load the menus for primary and secondary coooking and non-cooking schools
     load_menu(os.path.join(resource_dir, "menu.xls"))
 
-    template_xml = open(os.path.join(resource_dir, "scorecard.svg")).read().decode("utf-8")
+    template_xml = open(os.path.join(resource_dir, "scorecard2.svg")).read().decode("utf-8")
 
     # load all visit data
     all_data = load_data(filename, visit, calc_year, calc_month)
