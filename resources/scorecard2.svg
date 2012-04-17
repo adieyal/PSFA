@@ -2870,7 +2870,7 @@
      a:adobe-blending-mode="normal"
      font-size="7"
      id="tspan465"
-     style="font-size:7px;fill:#58595b;font-family:Helvetica">Based on assessments, your school has ranked {month_rank_total_str} this month and {year_rank_total_str} overall this year</tspan><tspan
+     style="font-size:7px;fill:#58595b;font-family:Helvetica">Based on assessments, your school has received a score of {pt_total}% this visit and is ranked {year_rank_total_str} overall this year</tspan><tspan
      x="355.38828"
      y="137.6084"
      a:adobe-blending-mode="normal"
