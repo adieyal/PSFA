@@ -31,6 +31,10 @@ class AvgSchoolData(object):
             return self.__dict__[key]
 
 class SchoolData(object):
+    """
+    A wrapper around a submission
+    """
+
     field_types = {
         "yes_is_1" : [
             "C1", "C2", "C4", "C5", "C6", "C7", "C8", "C9",

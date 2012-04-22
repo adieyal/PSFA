@@ -19,6 +19,9 @@ import constants
 from statswriter import StatsWriter
 from schooldata import AvgSchoolData, SchoolData
 
+# SVG template to use
+svg_template = "scorecard2.svg"
+
 re_qnum = re.compile("^(Timestamp|Verification Sch Number|[A-Z]\d+[a-z]?.).*")
 def extract_header(header):
     match = re_qnum.match(header)
@@ -30,7 +33,7 @@ def extract_header(header):
     #print header, " IS NONE!!!"
     return None
 
-def load_data(filename, visit, calc_year, calc_month, context):
+def load_data(filename, visit, calc_year, context):
     xls = xlrd.open_workbook(filename)
     sheet = xls.sheets()[0]
     data = defaultdict(list, {})
@@ -47,15 +50,12 @@ def load_data(filename, visit, calc_year, calc_month, context):
         current_visit = d["A7"]
 
         school_data = SchoolData(context, data_row, headers, xls.datemode)
-        # Only collect results from this year and from january until the current month
+        # Only collect results from this year
         if school_data.visit_date.year != calc_year: continue
-        if school_data.visit_date.month > calc_month: continue
         if not school_data.school_number in school_map: continue
 
         if current_visit == visit:
             data["current_visit"].append(school_data)
-        if school_data.visit_date.month == calc_month:
-            data["current_month"].append(school_data)
         data[current_visit].append(school_data)
         data["current_year"].append(school_data)
         data[school_data.school_number].append(school_data)
@@ -187,12 +187,6 @@ def render_scorecard(all_data, school, template_xml):
     avg_staff, perc_staff, _ = mean_percentile_rank(school.staff_score, [s.staff_score for s in not_my_school])
     avg_total, perc_total, rank_total = mean_percentile_rank(school.total_score, not_my_total_scores)
 
-    # this month
-    # TODO - this code currently assumes that there is at most 1 visit per month
-    not_my_school_month = [s for s in all_data["current_month"] if s != school]
-    _, _, month_rank_total = mean_percentile_rank(school.total_score, [s.total_score for s in not_my_school_month])
-
-    
     avg_data = {}
     for school_data in all_data["current_year"]:
         school_number = school_data.school_number
@@ -272,8 +266,6 @@ def render_scorecard(all_data, school, template_xml):
         "pt_total" : str(round(school.total_score * 100, 2)),
         "pt_avg_total" : str(round(avg_total * 100, 2)),
         "rank_total" : str(int(rank_total)),
-        "month_rank_total" : str(int(month_rank_total)),
-        "month_rank_total_str" : stringify_rank(int(month_rank_total)),
         "year_rank_total" : str(int(year_rank_total)),
         "year_rank_total_str" : stringify_rank(int(year_rank_total)),
         "service_tip" : constants.deviation_map[service_deviations[-1][0]],
@@ -307,8 +299,8 @@ def render_scorecard(all_data, school, template_xml):
     return template_xml
 
 def main(args):
-    if len(args) not in [3, 5]:
-        sys.stderr.write("Usage: %s <data file> <visit number> [year] [month]\n" % args[0])
+    if len(args) not in [3, 4]:
+        sys.stderr.write("Usage: %s <data file> <visit number> [year]\n" % args[0])
         sys.exit(1)
     code_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)))
     project_root = os.path.join(code_dir, os.path.pardir)
@@ -319,11 +311,9 @@ def main(args):
     visit = args[2]
     if len(args) == 5:
         calc_year = int(args[3])
-        calc_month = int(args[4])
     else:
         now = datetime.datetime.now()
         calc_year = now.year
-        calc_month = now.month
 
     if not os.path.exists(output_dir):
         os.mkdir(output_dir)
@@ -334,10 +324,10 @@ def main(args):
     context["school_map"] = load_schooltypes(os.path.join(resource_dir, "school_type.xls"))
     context["menu"] = load_menu(os.path.join(resource_dir, "menu.xls"))
 
-    template_xml = open(os.path.join(resource_dir, "scorecard2.svg")).read().decode("utf-8")
+    template_xml = open(os.path.join(resource_dir, svg_template)).read().decode("utf-8")
 
     # load all visit data
-    all_data = load_data(filename, visit, calc_year, calc_month, context)
+    all_data = load_data(filename, visit, calc_year, context)
 
     all_visit_data = all_data["current_visit"]
     for i, school in enumerate(all_visit_data):
