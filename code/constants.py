@@ -1,0 +1,73 @@
+deviation_map = {
+    "D1" : "Adhere to the menu guidelines",
+    "D3" : "Make additional contributions to the set menu",
+    "D4" : "Follow the preparation instructions provided by PSFA",
+    "D5" : "Use correct serving and eating utensils",
+    "D6" : "Reduce the amount of food waste",
+    "meal_served_on_time" : "Serve meal at the correct time",
+    "meal_served_efficiently" : "Serve meal efficiently so not to waste class time",
+    "food_deviations" : "Serve correct amounts of menu items",
+    "E3" : "Ensure that surface used to prepare food is clean",
+    "E4" : "Ensure that floor in kitchen is clean",
+    "E5" : "Ensure that cleaning materials are available",
+    "E6" : "Encourage volunteers to contribute to cleaning supplies",
+    "E7" : "Have soap always available for hand washing",
+    "E8" : "Keep a serviced fire extinguisher nearby",
+    "E9" : "Store gas cylinders in an appropriate way",
+    "E10" : "Have all volunteers cover their hair",
+    "E11" : "Encourage volunteers to practice appropriate personal hygiene",
+    "E12" : "Clean all kitchen equipment thoroughly",
+    "E13" : "Clean all equipment used by learners thoroughly",
+    "C1" : "Provide appropriate facilities for food storage",
+    "C2" : "Keep the store room well organised",
+    "C3" : "Keep all food off the ground in the storage area",
+    "C4" : "Keep the storage room well secured",
+    "food_in_good_condition" : "Keep all the food stuffs in good condition",
+    "C9" : "Rotate the stock to avoid wastage",
+    "C10" : "Notify PSFA in a timely manner when gas is needed",
+    "C11" : "Notify PSFA in timely manner if there is a shortage of food",
+    "staples_in_stock" : "Ration your supplies appropriately",
+    "F1" : "Limit days when volunteers are absent",
+    "F3" : "Monitor stock control on daily basis",
+    "F4" : "Keep volunteer honorarium up to date",
+    "F5" : "Display NSNP posters so visible to volunteers",
+    "F6" : "Encourage all volunteers to participate",
+    "F7" : "Improve communication with school coordinator",
+    "G1" : "Try to better motivate school feeding volunteers", # TODO how to do this
+    "G2" : "Encourage involvement of school coordinator",# TODO how to do this
+    "G3" : "Encourage involvement of principal",# TODO how to do this
+    "G4" : "Improve interaction between volunteers and students",# TODO how to do this
+}
+
+day_of_week = {
+    0 : "Monday",
+    1 : "Tuesday",
+    2 : "Wednesday",
+    3 : "Thursday",
+    4 : "Friday",
+    5 : "Saturday",
+    6 : "Sunday",
+}
+
+ingredient_qtys = {
+    "Pilchards" : 1.88,
+    "Rice" : 10,
+    "Savoury Mince" : 10,
+    "Curry Mince" : 10,
+    "Samp" : 10,
+    "Sugar beans" : 5,
+    "Brown lentils" : 0.5,
+    "Breyani spice" : 1,
+    "Cabbage" : 3,
+    "Carrots" : 5,
+    "Butternut" : 5,
+    "Fruits" : 0.15,
+    "Peanut butter" : 5,
+    "Jam" : 3.75,
+    "Baked beans" : 3,
+    "Jungle oats" : 1,
+    "Salt" : 1,
+    "Oil" : 4,
+    "Sugar" : 10,
+}
+
