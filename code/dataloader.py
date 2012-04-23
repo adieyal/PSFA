@@ -34,7 +34,11 @@ def load_schooltypes(filename):
         row = sheet.row_values(row_num)
         data = dict(zip(headers, row))
         school_num = int(data["schoolnumber"])
-        data["school_type"] = "Primary" if int(data["primary_school"]) == 1 else "Secondary"
+        if int(data["primary_school"]) == 1:
+            data["school_type"] = SchoolData.TYPE_PRIMARY 
+        else:
+            data["school_type"] = SchoolData.TYPE_SECONDARY
+
         data["score_card"] = int(data["score_card"])
         school_map[school_num] = data
     return school_map

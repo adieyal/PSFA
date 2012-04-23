@@ -48,6 +48,9 @@ class SchoolData(object):
     A wrapper around a submission
     """
 
+    TYPE_PRIMARY = "Primary"
+    TYPE_SECONDARY = "Secondary"
+
     field_types = {
         "yes_is_1" : [
             "C1", "C2", "C4", "C5", "C6", "C7", "C8", "C9",
@@ -201,7 +204,11 @@ class SchoolData(object):
     @property
     def meal_served_on_time(self):
         time_1030 = mktime(10, 30)
-        return self.D7a < time_1030
+        time_1130 = mktime(11, 30)
+        if self.school_type == SchoolData.TYPE_PRIMARY:
+            return self.D7a < time_1030
+        else:
+            return self.D7a < time_1130
 
     @property
     def ind_meal_served_on_time(self):
