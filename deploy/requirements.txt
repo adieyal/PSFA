@@ -1,5 +1,5 @@
-distribute==0.6.10
-tablib==0.9.11
-wsgiref==0.1.2
-xlrd==0.7.1
+distribute
+tablib
+wsgiref
+xlrd
 pbs
