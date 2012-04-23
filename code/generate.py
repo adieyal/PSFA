@@ -52,16 +52,20 @@ def main(args):
         stats_data.append(school.hygiene_score)
         stats_data.append(school.staff_score)
         stats_data.append(school.total_score)
-        stats_writer.write_stats(stats_data)
 
         school_xml = template_xml
-        school_xml = render.render_scorecard(all_data, school, school_xml)
+        indicators = render.calculate_indicators(all_data, school) 
+        stats_data.append(indicators["rank_total"])
+        stats_data.append(indicators["year_rank_total"])
+        school_xml = render.render_scorecard(indicators, school_xml)
 
         output_path = os.path.join(output_dir, "%s" % ("scorecard" if context["school_map"][school.school_number]["score_card"] == 1 else "noscorecard"))
         output_file = "%d.svg" % school.school_number
         f = open(os.path.join(output_path, output_file), "w")
         f.write(school_xml.encode("utf-8"))
         f.close()
+
+        stats_writer.write_stats(stats_data)
 
 if __name__ == "__main__":
     main(sys.argv)

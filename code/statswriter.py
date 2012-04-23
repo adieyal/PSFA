@@ -12,6 +12,8 @@ class StatsWriter(object):
             "Safety and hygiene score (%)", 
             "Staff score (%)", 
             "Score for your school (%)",
+            "Visit rank",
+            "Year rank",
         ]
 
         self.w.writerow(self.headers)

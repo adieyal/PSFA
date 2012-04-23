@@ -2,7 +2,7 @@ import numbers
 
 def process_svg_template(context, template_xml):
     for (key, value) in context.items():
-        template_xml = template_xml.replace('{%s}' % key, value)
+        template_xml = template_xml.replace('{%s}' % key, str(value))
 
     return template_xml
 
