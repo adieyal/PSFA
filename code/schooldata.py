@@ -2,11 +2,24 @@ import sys
 import datetime
 import stats
 import xlrd
-from mx.DateTime import Time, strptime
+
 from specialint import SpecialInt
 import constants
 
+def mktime(hour, minute=0, second=0):
+    date_tuple = (2000, 1, 1)
+    datetime_tuple = date_tuple + (hour, minute, second)
+    return datetime.datetime(*datetime_tuple)
+
 def parse_willa_time(val, datemode):
+    if val == "9:00 or earlier":
+        return mktime(9, 0, 0)
+    elif val == "12:00 or later":
+        return mktime(12, 0, 0)
+    date_tuple = xlrd.xldate_as_tuple(val, datemode)[3:]
+    return mktime(*date_tuple)
+
+def parse_willa_time1(val, datemode):
     if val == "9:00 or earlier":
         return Time(9, 0, 0)
     elif val == "12:00 or later":
@@ -79,7 +92,7 @@ class SchoolData(object):
             elif key in SchoolData.field_types["no_is_1"]:
                 return SpecialInt(self.no_is_1(val))
             elif key in SchoolData.field_types["is_date"]:
-                return strptime(val.strip(), "%d.%m.%Y")
+                return datetime.datetime.strptime(val.strip(), "%d.%m.%Y")
             elif key in SchoolData.field_types["is_time"]:
                 return self.parse_time(val)
             elif key in SchoolData.field_types["is_int"]:
@@ -187,7 +200,7 @@ class SchoolData(object):
 
     @property
     def meal_served_on_time(self):
-        time_1030 = datetime.time(10, 30)
+        time_1030 = mktime(10, 30)
         return self.D7a < time_1030
 
     @property
@@ -201,7 +214,8 @@ class SchoolData(object):
         if self.D7a == None or self.D7b == None:
             return SpecialInt(None)
         diff = self.D7b - self.D7a
-        return diff.minutes < 30
+        minutes = diff.seconds / 60.
+        return minutes < 30.0
 
     @property
     def ind_meal_served_efficiently(self):
