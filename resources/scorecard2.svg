@@ -2188,15 +2188,15 @@
    guidetolerance="10"
    inkscape:pageopacity="0"
    inkscape:pageshadow="2"
-   inkscape:window-width="1918"
-   inkscape:window-height="1019"
+   inkscape:window-width="917"
+   inkscape:window-height="1034"
    id="namedview1690"
    showgrid="false"
    inkscape:zoom="2.955385"
-   inkscape:cx="874.35406"
-   inkscape:cy="82.216818"
-   inkscape:window-x="0"
-   inkscape:window-y="30"
+   inkscape:cx="360.03867"
+   inkscape:cy="352.90913"
+   inkscape:window-x="1001"
+   inkscape:window-y="15"
    inkscape:window-maximized="0"
    inkscape:current-layer="Layer_1" />
 <rect
@@ -2773,6 +2773,7 @@
    x="155.3345"
    y="96.521004">School Feeding Team Performance Score Card</text>
 
+
 <path
    d="M 416.312,41.895 C 313.63,36.503 181.07,37.649 37.845,41.895 v 67.134 c 117.729,-3.396 259.048,-7.252 380.007,-0.591 l -1.54,-66.543 z"
    id="path443"
@@ -2841,6 +2842,7 @@
      id="tspan455"
      style="font-size:11px;fill:#58595b;font-family:Helvetica-Bold">Team Performance Score Card</tspan></text>
 
+
 <rect
    x="70.695999"
    y="119.112"
@@ -2853,6 +2855,7 @@
    style="font-size:9px;fill:#be1e2d;font-family:Helvetica-Bold"
    x="70.696297"
    y="125.5835">OVERALL PERFORMANCE</text>
+
 
 <rect
    x="70.695999"
@@ -2878,6 +2881,7 @@
      id="tspan467"
      style="font-size:8px;fill:#58595b;font-family:Helvetica">.</tspan></text>
 
+
 <rect
    x="444.5"
    y="119.112"
@@ -2891,6 +2895,7 @@
    x="444.5"
    y="125.5835">KEY PERFORMANCE AREAS</text>
 
+
 <rect
    x="442.49399"
    y="133.856"
@@ -2903,6 +2908,7 @@
    style="font-size:7px;fill:#58595b;font-family:Helvetica"
    x="442.49411"
    y="138.88921">Your school has received performance scores in 4 key performance areas. All scores are out of ten.</text>
+
 
 <path
    d="M 796.219,41.408 C 693.536,36.745 559.865,37.615 416.64,41.287 v 67.821 c 117.729,-2.938 258.621,-6.542 379.579,-0.781 V 41.408 z"
@@ -2928,6 +2934,7 @@
    x="98.4468"
    y="164.7515">SCORE FOR YOUR SCHOOL</text>
 
+
 <rect
    x="227.436"
    y="159.71899"
@@ -2940,6 +2947,7 @@
    style="font-size:7px;fill:#58595b;font-family:Helvetica-Bold"
    x="231.0264"
    y="164.7515">AVERAGE SCORE FOR OTHER SCHOOLS</text>
+
 
 <rect
    x="73.695999"
@@ -3019,6 +3027,7 @@
      id="tspan603"
      style="font-size:6px;fill:#58595b;font-family:Helvetica">Please contact PSFA if you have any questions regarding the card.</tspan></text>
 
+
 <path
    stroke-miterlimit="10"
    d="m 386.809,541.91 c 0,6.627 -5.372,12 -12,12 H 74.091 c -6.627,0 -12,-5.373 -12,-12 v -90.14 c 0,-6.627 5.373,-12 12,-12 h 300.718 c 6.628,0 12,5.373 12,12 v 90.14 z"
@@ -3053,6 +3062,7 @@
      id="tspan615"
      style="font-size:9px;font-family:Helvetica" /></text>
 
+
 <rect
    x="445.32501"
    y="82.655998"
@@ -3077,6 +3087,7 @@
      id="tspan623"
      style="font-size:9px;font-family:Helvetica" /></text>
 
+
 <path
    d="m 383.301,419.786 c 0,6.628 -4.373,11 -11,11 H 76.599 c -6.627,0 -11,-4.372 -11,-11 v -99.36 c 0,-6.627 4.373,-11 11,-11 h 295.702 c 6.627,0 11,5.373 11,12 v 98.36 z"
    id="path645"
@@ -3098,6 +3109,7 @@
    x="291.1665"
    y="265.20511">AVERAGE YEAR SCORE</text>
 
+
 <rect
    x="291.16699"
    y="271.45801"
@@ -3112,7 +3124,7 @@
      y="275.7778"
      font-size="6"
      id="tspan1052"
-     style="font-size:6px;fill:#58595b;font-family:Helvetica-Oblique">Rank out of 100 participating </tspan><tspan
+     style="font-size:6px;fill:#58595b;font-family:Helvetica-Oblique">Rank out of {num_schools} participating </tspan><tspan
      x="291.1665"
      y="282.7778"
      font-size="6"
@@ -3123,6 +3135,7 @@
      font-size="6"
      id="tspan1056"
      style="font-size:6px;fill:#58595b;font-family:Helvetica-Oblique">year.</tspan></text>
+
 
 <path
    inkscape:connector-curvature="0"
@@ -3156,6 +3169,7 @@
    y="281.58249"><tspan
      style="text-align:center;text-anchor:middle;-inkscape-font-specification:Helvetica;font-family:Helvetica;font-size:18.99999967000000112px;font-weight:bold"
      id="tspan12441">{year_rank_total}</tspan></text>
+
 
 <line
    stroke-miterlimit="10"
@@ -3226,6 +3240,7 @@
    x="73.696297"
    y="269.41849">FOCUS AREAS FOR IMPROVEMENT</text>
 
+
 <rect
    x="73.695999"
    y="277.81201"
@@ -3251,6 +3266,7 @@
      font-size="6"
      id="tspan1662"
      style="font-size:6px;fill:#58595b;font-family:Helvetica">focus on achieving the following goals:</tspan></text>
+
 
 <rect
    x="73.241997"
@@ -8171,6 +8187,7 @@ vTNS7iv4dcVKrHXLwwwo5meAVF8h8HB75SlotX85P5l829c1kSIqw7mvCf6pnTs81rgGj10NSzGx
    id="text875"
    font-size="6">STAFF COMMITMENT</text>
 
+
 <g
    id="g879"
    transform="translate(7.2483089,-42.523077)"><path
@@ -8302,6 +8319,7 @@ vTNS7iv4dcVKrHXLwwwo5meAVF8h8HB75SlotX85P5l829c1kSIqw7mvCf6pnTs81rgGj10NSzGx
    id="text925"
    font-size="6">HANDLING OF STOCK</text>
 
+
 <rect
    style="fill:none"
    id="rect927"
@@ -8315,6 +8333,7 @@ vTNS7iv4dcVKrHXLwwwo5meAVF8h8HB75SlotX85P5l829c1kSIqw7mvCf6pnTs81rgGj10NSzGx
    id="text929"
    font-size="6">SAFETY AND HYGIENE</text>
 
+
 <rect
    style="fill:none"
    id="rect931"
@@ -8327,6 +8346,7 @@ vTNS7iv4dcVKrHXLwwwo5meAVF8h8HB75SlotX85P5l829c1kSIqw7mvCf6pnTs81rgGj10NSzGx
    style="font-size:6px;font-family:Helvetica-Bold"
    id="text933"
    font-size="6">SERVICE DELIVERY</text>
+
 
 <rect
    style="fill:none"
@@ -8408,6 +8428,7 @@ vTNS7iv4dcVKrHXLwwwo5meAVF8h8HB75SlotX85P5l829c1kSIqw7mvCf6pnTs81rgGj10NSzGx
      font-size="5"
      y="424.62927"
      x="605.0473">School programme management team’s involvement</tspan></text>
+
 
 <g
    id="g967"
@@ -8604,6 +8625,7 @@ vTNS7iv4dcVKrHXLwwwo5meAVF8h8HB75SlotX85P5l829c1kSIqw7mvCf6pnTs81rgGj10NSzGx
      y="496.25232"
      x="670.72479">– In lower 2/3 of schools for measures</tspan></text>
 
+
 <path
    style="fill:none;stroke:#6d6e71;stroke-width:0.5;stroke-miterlimit:10"
    inkscape:connector-curvature="0"
@@ -8658,6 +8680,7 @@ vTNS7iv4dcVKrHXLwwwo5meAVF8h8HB75SlotX85P5l829c1kSIqw7mvCf6pnTs81rgGj10NSzGx
    id="text1359"
    font-size="7">{pt_ydelivery}</text>
 
+
 <rect
    x="604.98029"
    y="169.74992"
@@ -8695,6 +8718,7 @@ vTNS7iv4dcVKrHXLwwwo5meAVF8h8HB75SlotX85P5l829c1kSIqw7mvCf6pnTs81rgGj10NSzGx
    id="text1375"
    font-size="5">Your School</text>
 
+
 <rect
    style="fill:none"
    id="rect1377"
@@ -8707,6 +8731,7 @@ vTNS7iv4dcVKrHXLwwwo5meAVF8h8HB75SlotX85P5l829c1kSIqw7mvCf6pnTs81rgGj10NSzGx
    style="font-size:5px;fill:#414042;font-family:Helvetica"
    id="text1379"
    font-size="5">Other Schools</text>
+
 
 <rect
    style="fill:none"
@@ -8756,6 +8781,7 @@ vTNS7iv4dcVKrHXLwwwo5meAVF8h8HB75SlotX85P5l829c1kSIqw7mvCf6pnTs81rgGj10NSzGx
    style="font-size:7px;fill:#6d6e71;font-family:Helvetica-Bold"
    id="text1407"
    font-size="7">{pt_odelivery}</text>
+
 
 <rect
    x="625.3783"
@@ -9019,6 +9045,7 @@ vTNS7iv4dcVKrHXLwwwo5meAVF8h8HB75SlotX85P5l829c1kSIqw7mvCf6pnTs81rgGj10NSzGx
      y="160.52773"
      x="605.04529">Correct use of equipment and supplies</tspan></text>
 
+
 <g
    id="g1481"
    transform="translate(7.2483089,-42.523077)"><circle
@@ -9131,6 +9158,7 @@ vTNS7iv4dcVKrHXLwwwo5meAVF8h8HB75SlotX85P5l829c1kSIqw7mvCf6pnTs81rgGj10NSzGx
      y="249.1205"
      x="605.0473">Hygienic treatment of equipment and supplies</tspan></text>
 
+
 <path
    style="fill:#bcbec0"
    inkscape:connector-curvature="0"
@@ -9216,6 +9244,7 @@ vTNS7iv4dcVKrHXLwwwo5meAVF8h8HB75SlotX85P5l829c1kSIqw7mvCf6pnTs81rgGj10NSzGx
      y="336.33243"
      x="605.0473">Correct management of fuel supplies</tspan></text>
 
+
 <path
    style="fill:#bcbec0"
    inkscape:connector-curvature="0"
@@ -9255,6 +9284,7 @@ vTNS7iv4dcVKrHXLwwwo5meAVF8h8HB75SlotX85P5l829c1kSIqw7mvCf6pnTs81rgGj10NSzGx
      y="153.48083"
      x="512.04523">the school.</tspan></text>
 
+
 <rect
    style="fill:none"
    id="rect1573"
@@ -9282,6 +9312,7 @@ vTNS7iv4dcVKrHXLwwwo5meAVF8h8HB75SlotX85P5l829c1kSIqw7mvCf6pnTs81rgGj10NSzGx
      y="241.62831"
      x="510.0452">preparing and serving school meal.</tspan></text>
 
+
 <rect
    style="fill:none"
    id="rect1583"
@@ -9308,6 +9339,7 @@ vTNS7iv4dcVKrHXLwwwo5meAVF8h8HB75SlotX85P5l829c1kSIqw7mvCf6pnTs81rgGj10NSzGx
      font-size="5"
      y="330.28653"
      x="510.5354">PSFA food products.</tspan></text>
+
 
 <rect
    style="fill:none"
@@ -9341,6 +9373,7 @@ vTNS7iv4dcVKrHXLwwwo5meAVF8h8HB75SlotX85P5l829c1kSIqw7mvCf6pnTs81rgGj10NSzGx
      y="420.62927"
      x="510.2659">volunteers &amp; school management.</tspan></text>
 
+
 <rect
    style="fill:none"
    id="rect1605"
@@ -9367,6 +9400,7 @@ vTNS7iv4dcVKrHXLwwwo5meAVF8h8HB75SlotX85P5l829c1kSIqw7mvCf6pnTs81rgGj10NSzGx
      font-size="5"
      y="495.19666"
      x="542.53741">schools in the area.</tspan></text>
+
 
 <rect
    x="625.3783"
@@ -9431,6 +9465,7 @@ vTNS7iv4dcVKrHXLwwwo5meAVF8h8HB75SlotX85P5l829c1kSIqw7mvCf6pnTs81rgGj10NSzGx
    x="720.64026"
    y="238.19501">{pt_ysafety}</text>
 
+
 <rect
    style="fill:#bcbec0"
    id="rect1363-9"
@@ -9462,12 +9497,14 @@ vTNS7iv4dcVKrHXLwwwo5meAVF8h8HB75SlotX85P5l829c1kSIqw7mvCf6pnTs81rgGj10NSzGx
    x="482.51813"
    y="236.7746">Your School</text>
 
+
 <text
    font-size="5"
    id="text1379-3"
    style="font-size:5px;fill:#414042;font-family:Helvetica"
    x="478.07474"
    y="247.1705">Other Schools</text>
+
 
 <rect
    x="716.49579"
@@ -9481,6 +9518,7 @@ vTNS7iv4dcVKrHXLwwwo5meAVF8h8HB75SlotX85P5l829c1kSIqw7mvCf6pnTs81rgGj10NSzGx
    style="font-size:7px;fill:#6d6e71;font-family:Helvetica-Bold"
    x="720.51617"
    y="247.0675">{pt_osafety}</text>
+
 
 <rect
    style="fill:#bcbec0"
@@ -9726,6 +9764,7 @@ vTNS7iv4dcVKrHXLwwwo5meAVF8h8HB75SlotX85P5l829c1kSIqw7mvCf6pnTs81rgGj10NSzGx
    x="720.64026"
    y="238.19501">{pt_ystock}</text>
 
+
 <rect
    style="fill:#bcbec0"
    id="rect1363-9-9"
@@ -9757,12 +9796,14 @@ vTNS7iv4dcVKrHXLwwwo5meAVF8h8HB75SlotX85P5l829c1kSIqw7mvCf6pnTs81rgGj10NSzGx
    x="482.51813"
    y="236.7746">Your School</text>
 
+
 <text
    font-size="5"
    id="text1379-3-5"
    style="font-size:5px;fill:#414042;font-family:Helvetica"
    x="478.07474"
    y="247.1705">Other Schools</text>
+
 
 <rect
    x="716.49579"
@@ -9776,6 +9817,7 @@ vTNS7iv4dcVKrHXLwwwo5meAVF8h8HB75SlotX85P5l829c1kSIqw7mvCf6pnTs81rgGj10NSzGx
    style="font-size:7px;fill:#6d6e71;font-family:Helvetica-Bold"
    x="720.51617"
    y="247.0675">{pt_ostock}</text>
+
 
 <rect
    style="fill:#bcbec0"
@@ -10021,6 +10063,7 @@ vTNS7iv4dcVKrHXLwwwo5meAVF8h8HB75SlotX85P5l829c1kSIqw7mvCf6pnTs81rgGj10NSzGx
    x="720.64026"
    y="238.19501">{pt_ystaff}</text>
 
+
 <rect
    style="fill:#bcbec0"
    id="rect1363-9-9-8"
@@ -10052,12 +10095,14 @@ vTNS7iv4dcVKrHXLwwwo5meAVF8h8HB75SlotX85P5l829c1kSIqw7mvCf6pnTs81rgGj10NSzGx
    x="482.51813"
    y="236.7746">Your School</text>
 
+
 <text
    font-size="5"
    id="text1379-3-5-6"
    style="font-size:5px;fill:#414042;font-family:Helvetica"
    x="478.07474"
    y="247.1705">Other Schools</text>
+
 
 <rect
    x="716.49579"
@@ -10071,6 +10116,7 @@ vTNS7iv4dcVKrHXLwwwo5meAVF8h8HB75SlotX85P5l829c1kSIqw7mvCf6pnTs81rgGj10NSzGx
    style="font-size:7px;fill:#6d6e71;font-family:Helvetica-Bold"
    x="720.51617"
    y="247.0675">{pt_ostaff}</text>
+
 
 <rect
    style="fill:#bcbec0"
@@ -10794,6 +10840,7 @@ vTNS7iv4dcVKrHXLwwwo5meAVF8h8HB75SlotX85P5l829c1kSIqw7mvCf6pnTs81rgGj10NSzGx
    x="232.20464"
    y="190.50827">0</text>
 
+
 <rect
    style="fill:none"
    id="rect524"
@@ -10806,6 +10853,7 @@ vTNS7iv4dcVKrHXLwwwo5meAVF8h8HB75SlotX85P5l829c1kSIqw7mvCf6pnTs81rgGj10NSzGx
    font-size="6.0295"
    x="358.4761"
    y="190.50827">100</text>
+
 
 <g
    transform="translate(-0.36666741,0.91255651)"
@@ -10850,6 +10898,7 @@ vTNS7iv4dcVKrHXLwwwo5meAVF8h8HB75SlotX85P5l829c1kSIqw7mvCf6pnTs81rgGj10NSzGx
    font-size="6.0295"
    id="text555"
    style="font-size:6.02950001px;font-family:Helvetica-Bold">{pt_avg_total}%</text>
+
 
 <polygon
    points="277.855,187.095 274.053,190.897 270.687,187.095 "
@@ -10929,6 +10978,7 @@ vTNS7iv4dcVKrHXLwwwo5meAVF8h8HB75SlotX85P5l829c1kSIqw7mvCf6pnTs81rgGj10NSzGx
    font-size="6.0295"
    transform="translate(77.2378,189.5957)">0</text>
 
+
 <rect
    style="fill:none"
    id="rect1643"
@@ -10940,6 +10990,7 @@ vTNS7iv4dcVKrHXLwwwo5meAVF8h8HB75SlotX85P5l829c1kSIqw7mvCf6pnTs81rgGj10NSzGx
    id="text1645"
    font-size="6.0295"
    transform="translate(203.5093,189.5957)">100</text>
+
 
 <g
    id="g1647"><g
@@ -11015,6 +11066,7 @@ vTNS7iv4dcVKrHXLwwwo5meAVF8h8HB75SlotX85P5l829c1kSIqw7mvCf6pnTs81rgGj10NSzGx
    font-size="6.0295"
    id="text1676"
    style="font-size:6.02950001px;font-family:Helvetica-Bold">{pt_total}%</text>
+
 
 <polygon
    points="173.683,190.897 170.317,187.095 177.486,187.095 "
