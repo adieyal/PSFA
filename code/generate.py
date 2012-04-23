@@ -13,10 +13,6 @@ def main(args):
     if len(args) not in [3, 4]:
         sys.stderr.write("Usage: %s <data file> <visit number> [year]\n" % args[0])
         sys.exit(1)
-    code_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)))
-    project_root = os.path.join(code_dir, os.path.pardir)
-    resource_dir = os.path.join(project_root, "resources")
-    output_dir = os.path.join(project_root, "output")
 
     filename = args[1]
     visit = args[2]
@@ -26,10 +22,17 @@ def main(args):
         now = datetime.datetime.now()
         calc_year = now.year
 
-    if not os.path.exists(output_dir):
-        os.mkdir(output_dir)
-        os.mkdir(os.path.join(output_dir, "scorecard"))
-        os.mkdir(os.path.join(output_dir, "noscorecard"))
+    code_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)))
+    project_root = os.path.join(code_dir, os.path.pardir)
+    resource_dir = os.path.join(project_root, "resources")
+    output_dir = os.path.join(project_root, "output", visit)
+
+    if not os.path.exists(os.path.join(output_dir, "scorecard")):
+        os.makedirs(os.path.join(output_dir, "scorecard"))
+
+    if not os.path.exists(os.path.join(output_dir, "noscorecard")):
+        os.makedirs(os.path.join(output_dir, "noscorecard"))
+
     stats_writer = StatsWriter(open("stats.csv", "w"))
 
     context = {}
