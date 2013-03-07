@@ -13,26 +13,24 @@ def main(args):
     if len(args) not in [3, 4]:
         sys.stderr.write("Usage: %s <data file> <visit number> [year]\n" % args[0])
         sys.exit(1)
+    code_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)))
+    project_root = os.path.join(code_dir, os.path.pardir)
+    resource_dir = os.path.join(project_root, "resources")
 
+    #import pdb; pdb.set_trace()
     filename = args[1]
     visit = args[2]
-    if len(args) == 5:
+    output_dir = os.path.join(project_root, "output" + "." + visit)
+    if len(args) == 4:
         calc_year = int(args[3])
     else:
         now = datetime.datetime.now()
         calc_year = now.year
 
-    code_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)))
-    project_root = os.path.join(code_dir, os.path.pardir)
-    resource_dir = os.path.join(project_root, "resources")
-    output_dir = os.path.join(project_root, "output", visit)
-
-    if not os.path.exists(os.path.join(output_dir, "scorecard")):
-        os.makedirs(os.path.join(output_dir, "scorecard"))
-
-    if not os.path.exists(os.path.join(output_dir, "noscorecard")):
-        os.makedirs(os.path.join(output_dir, "noscorecard"))
-
+    if not os.path.exists(output_dir):
+        os.mkdir(output_dir)
+        os.mkdir(os.path.join(output_dir, "scorecard"))
+        os.mkdir(os.path.join(output_dir, "noscorecard"))
     stats_writer = StatsWriter(open("stats.csv", "w"))
 
     context = {}
@@ -55,20 +53,16 @@ def main(args):
         stats_data.append(school.hygiene_score)
         stats_data.append(school.staff_score)
         stats_data.append(school.total_score)
+        stats_writer.write_stats(stats_data)
 
         school_xml = template_xml
-        indicators = render.calculate_indicators(all_data, school) 
-        stats_data.append(indicators["rank_total"])
-        stats_data.append(indicators["year_rank_total"])
-        school_xml = render.render_scorecard(indicators, school_xml)
+        school_xml = render.render_scorecard(all_data, school, school_xml)
 
         output_path = os.path.join(output_dir, "%s" % ("scorecard" if context["school_map"][school.school_number]["score_card"] == 1 else "noscorecard"))
         output_file = "%d.svg" % school.school_number
         f = open(os.path.join(output_path, output_file), "w")
         f.write(school_xml.encode("utf-8"))
         f.close()
-
-        stats_writer.write_stats(stats_data)
 
 if __name__ == "__main__":
     main(sys.argv)

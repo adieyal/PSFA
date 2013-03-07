@@ -6,49 +6,9 @@ import processutils
 from processutils import xmlutils
 from schooldata import AvgSchoolData, SchoolData
 
-def mean_percentile_rank(val, vals):
-    """
-    Expect that vals does not contain val
-    """
-    all_vals = [val] + vals
-    mean_val = round(stats.mean(all_vals), 1)
-    val_rank = stats.rank(all_vals)[0]
-    perc = calc_smiley_face(val, vals)
 
-    return mean_val, perc, val_rank
-
-def calc_smiley_face(val, vals):
-    sorted_vals = sorted([val] + vals)
-    lbound = stats.percentile(sorted_vals, 0.33333)
-    ubound = stats.percentile(sorted_vals, 0.66666)
-
-    if val >= ubound:
-        perc = "green"
-    elif val >= lbound:
-        perc = "yellow"
-    else:
-        perc = "red"
-    return perc
-
-def stringify_rank(school_rank):
-    s_school_rank = str(school_rank)
-    last_digit = s_school_rank[-1]
-    if last_digit == "1":
-        return "%sst" % school_rank
-    elif last_digit == "2":
-        return "%snd" % school_rank
-    elif last_digit == "3":
-        return "%srd" % school_rank
-    else:
-        return "%sth" % school_rank
-
-def show_smiley_face(xml, suffix, perc):
-    for colour in ["red", "yellow", "green"]:
-        if perc != colour:
-            n = xmlutils.get_el_by_id(xml, "g", "%s%s" % (colour, suffix))
-            n.parentNode.removeChild(n)
-
-                
+def html_escape(s):
+    return s.replace("&", "&amp;")
 
 def generate_graph(xml, prefix, val, width=19.407):
     # ensure that ceil of 5 is 6
@@ -75,8 +35,50 @@ def remove_disclaimer(xml):
     n = xmlutils.get_el_by_id(xml, "flowRoot", "disclaimer")
     n.parentNode.removeChild(n)
 
-def calculate_indicators(all_data, school): 
+def render_scorecard(all_data, school, template_xml): 
 
+    def mean_percentile_rank(val, vals):
+        """
+        Expect that vals does not contain val
+        """
+        all_vals = [val] + vals
+        mean_val = round(stats.mean(all_vals), 1)
+        val_rank = stats.rank(all_vals)[0]
+        perc = calc_smiley_face(val, vals)
+
+        return mean_val, perc, val_rank
+
+    def calc_smiley_face(val, vals):
+        sorted_vals = sorted([val] + vals)
+        lbound = stats.percentile(sorted_vals, 0.33333)
+        ubound = stats.percentile(sorted_vals, 0.66666)
+
+        if val >= ubound:
+            perc = "green"
+        elif val >= lbound:
+            perc = "yellow"
+        else:
+            perc = "red"
+        return perc
+
+    def show_smiley_face(xml, suffix, perc):
+        for colour in ["red", "yellow", "green"]:
+            if perc != colour:
+                n = xmlutils.get_el_by_id(xml, "g", "%s%s" % (colour, suffix))
+                n.parentNode.removeChild(n)
+
+    def stringify_rank(school_rank):
+        s_school_rank = str(school_rank)
+        last_digit = s_school_rank[-1]
+        if last_digit == "1":
+            return "%sst" % school_rank
+        elif last_digit == "2":
+            return "%snd" % school_rank
+        elif last_digit == "3":
+            return "%srd" % school_rank
+        else:
+            return "%sth" % school_rank
+                
     visit_data = all_data["current_visit"]
 
     visit_average = AvgSchoolData(school_datas=visit_data)
@@ -166,60 +168,40 @@ def calculate_indicators(all_data, school):
         "pt_ostaff" : str(avg_staff),
         "pt_total" : str(round(school.total_score * 100, 2)),
         "pt_avg_total" : str(round(avg_total * 100, 2)),
-        # Ranks
         "rank_total" : str(int(rank_total)),
         "year_rank_total" : str(int(year_rank_total)),
         "year_rank_total_str" : stringify_rank(int(year_rank_total)),
-        # Tips
         "service_tip" : constants.deviation_map[service_deviations[-1][0]],
         "safety_tip" : constants.deviation_map[safety_deviations[-1][0]],
         "stock_tip" : constants.deviation_map[stock_deviations[-1][0]],
         "staff_tip" : constants.deviation_map[staff_deviations[-1][0]],
-        # School Scores
-        "s_meal_delivery_score" : school.meal_delivery_score,
-        "s_hygiene_score" : school.hygiene_score,
-        "s_stock_score" : school.stock_score,
-        "s_staff_score" : school.staff_score,
-        "s_total_score" : school.total_score,
-        # Average Scores
-        "avg_meal_delivery_score" : avg_delivery,
-        "avg_safety" : avg_safety,
-        "avg_stock" : avg_stock,
-        "avg_staff" : avg_staff,
-        "avg_total" : avg_total,
-        # Percentiles
-        "perc_delivery" : perc_delivery,
-        "perc_safety" : perc_safety,
-        "perc_stock" : perc_stock,
-        "perc_staff" : perc_staff,
-        # Misc
-        "volunteers_interviewed" : school.voluteers_interviewed,
         "num_schools" : str(len(avg_data) + 1),
     }
+    for k, v in context.items():
+        context[k] = html_escape(v)
 
-    return context
-
-def render_scorecard(context, template_xml): 
     template_xml = processutils.process_svg_template(context, template_xml)
     xml = minidom.parseString(template_xml.encode("utf-8"))
-    generate_graph(xml, "del_y", context["s_meal_delivery_score"])
-    generate_graph(xml, "del_o", context["avg_meal_delivery_score"])
-    generate_graph(xml, "saf_y", context["s_hygiene_score"])
-    generate_graph(xml, "saf_o", context["avg_safety"])
-    generate_graph(xml, "stock_y", context["s_stock_score"])
-    generate_graph(xml, "stock_o", context["avg_stock"])
-    generate_graph(xml, "staff_y", context["s_staff_score"])
-    generate_graph(xml, "staff_o", context["avg_staff"])
 
-    generate_arrow_graph(xml, "pt_total", context["s_total_score"], -91.6875, 29.063798)
-    generate_arrow_graph(xml, "pt_avg_total", context["avg_total"], -36.8125, 83.9375)
+    generate_graph(xml, "del_y", school.meal_delivery_score)
+    generate_graph(xml, "del_o", avg_delivery)
+    generate_graph(xml, "saf_y", school.hygiene_score)
+    generate_graph(xml, "saf_o", avg_safety)
+    generate_graph(xml, "stock_y", school.stock_score)
+    generate_graph(xml, "stock_o", avg_stock)
+    generate_graph(xml, "staff_y", school.staff_score)
+    generate_graph(xml, "staff_o", avg_staff)
 
-    show_smiley_face(xml, "_delivery", context["perc_delivery"])
-    show_smiley_face(xml, "_safety", context["perc_safety"])
-    show_smiley_face(xml, "_stock", context["perc_stock"])
-    show_smiley_face(xml, "_staff", context["perc_staff"])
+    generate_arrow_graph(xml, "pt_total", school.total_score, -91.6875, 29.063798)
+    generate_arrow_graph(xml, "pt_avg_total", avg_total, -36.8125, 83.9375)
 
-    if not context["volunteers_interviewed"]: 
+    show_smiley_face(xml, "_delivery", perc_delivery)
+    show_smiley_face(xml, "_safety", perc_safety)
+    show_smiley_face(xml, "_stock", perc_stock)
+    show_smiley_face(xml, "_staff", perc_staff)
+
+    if not school.voluteers_interviewed: 
         remove_disclaimer(xml)
     template_xml = xml.toxml()
     return template_xml
+
